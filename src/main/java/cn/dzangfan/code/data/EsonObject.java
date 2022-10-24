@@ -65,12 +65,6 @@ public class EsonObject extends EsonValue {
     }
 
     @Override
-    public boolean isCondition() {
-        return content.stream().map(Entry::getValue)
-                .allMatch(EsonValue::isCondition);
-    }
-
-    @Override
     public <T> T on(CaseFunction<T> function) {
         return function.whenObject(this);
     }

@@ -35,10 +35,4 @@ public class EsonApplication extends EsonValue {
     public <T> T on(CaseFunction<T> function) {
         return function.whenApplication(this);
     }
-
-    @Override
-    public boolean isCondition() {
-        return false;
-    }
-
 }

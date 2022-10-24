@@ -30,11 +30,6 @@ public class EsonArray extends EsonValue {
     }
 
     @Override
-    public boolean isCondition() {
-        return content.stream().allMatch(EsonValue::isCondition);
-    }
-
-    @Override
     public <T> T on(CaseFunction<T> function) {
         return function.whenArray(this);
     }

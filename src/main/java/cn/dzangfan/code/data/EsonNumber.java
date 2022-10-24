@@ -11,11 +11,6 @@ public class EsonNumber extends EsonValue {
         this.isInteger = isInteger;
     }
 
-    @Override
-    public boolean isCondition() {
-        return true;
-    }
-
     public static EsonNumber fromInteger(Integer integer) {
         return new EsonNumber(integer, true);
     }

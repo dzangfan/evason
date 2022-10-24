@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import cn.dzangfan.code.data.function.IsCondition;
+
 public class EsonLambda extends EsonValue {
 
     private List<Branch> content;
@@ -19,7 +21,7 @@ public class EsonLambda extends EsonValue {
         }
 
         public static Branch from(EsonValue condition, EsonValue value) {
-            if (!condition.isCondition()) {
+            if (!condition.on(IsCondition.getInstance())) {
                 throw new IllegalArgumentException(
                         "condition must satify Eson::isCondition");
             }
@@ -63,11 +65,6 @@ public class EsonLambda extends EsonValue {
 
     public void setContent(List<Branch> content) {
         this.content = content;
-    }
-
-    @Override
-    public boolean isCondition() {
-        return false;
     }
 
     @Override

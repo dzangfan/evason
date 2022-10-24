@@ -1,5 +1,7 @@
 package cn.dzangfan.code.data;
 
+import java.util.Objects;
+
 public class EsonSpecialValue extends EsonValue {
 
     private EsonSpecialValue() {
@@ -21,6 +23,14 @@ public class EsonSpecialValue extends EsonValue {
         } else {
             return function.whenNull();
         }
+    }
+
+    public static EsonSpecialValue from(Boolean nullableBoolean) {
+        if (Objects.isNull(nullableBoolean))
+            return NULL;
+        if (nullableBoolean)
+            return TRUE;
+        return FALSE;
     }
 
     public boolean isTrue() {

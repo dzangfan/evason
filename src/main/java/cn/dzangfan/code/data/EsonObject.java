@@ -69,4 +69,15 @@ public class EsonObject extends EsonValue {
         return function.whenObject(this);
     }
 
+    public EsonValue add(EsonID id, EsonValue value) {
+        if (content.stream().anyMatch(entry -> {
+            return entry.getKey().getName().equals(id.getName());
+        })) {
+            String message = String.format("Key %s has appeared", id.getName());
+            throw new IllegalArgumentException(message);
+        }
+        content.add(Entry.from(id, value));
+        return value;
+    }
+
 }

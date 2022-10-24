@@ -33,7 +33,7 @@ public class IsCondition extends CaseFunction<Boolean> {
     }
 
     private IsCondition() {
-        super(() -> true);
+        super((__) -> true);
     }
 
     @Override

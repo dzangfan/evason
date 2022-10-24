@@ -37,7 +37,7 @@ public class GetDependencies extends CaseFunction<Set<String>> {
     }
 
     private GetDependencies() {
-        super(() -> Set.of());
+        super((__) -> Set.of());
     }
 
     @Override

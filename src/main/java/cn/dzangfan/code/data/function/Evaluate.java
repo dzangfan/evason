@@ -1,8 +1,6 @@
 package cn.dzangfan.code.data.function;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import cn.dzangfan.code.data.CaseFunction;
 import cn.dzangfan.code.data.EsonApplication;
@@ -18,8 +16,9 @@ import cn.dzangfan.code.data.EsonSymbol;
 import cn.dzangfan.code.data.EsonValue;
 import cn.dzangfan.code.exn.EsonRedefinitionException;
 import cn.dzangfan.code.exn.EsonRuntimeException;
+import cn.dzangfan.code.exn.EsonUndefinedIDException;
 import cn.dzangfan.code.rumtime.Environment;
-import cn.dzangfan.code.utils.DependenceTree;
+import cn.dzangfan.code.rumtime.SymbolTable;
 
 public class Evaluate extends CaseFunction<EsonValue> {
 
@@ -61,7 +60,14 @@ public class Evaluate extends CaseFunction<EsonValue> {
 
     @Override
     public EsonValue whenID(EsonID id) {
-        return id;
+        try {
+            SymbolTable.Entry entry = environment.find(id);
+            return entry.getValue();
+        } catch (EsonUndefinedIDException e) {
+            EsonRuntimeException re = new EsonRuntimeException();
+            re.initCause(e);
+            throw re;
+        }
     }
 
     @Override
@@ -98,27 +104,13 @@ public class Evaluate extends CaseFunction<EsonValue> {
 
     @Override
     public EsonValue whenApplication(EsonApplication application) {
-        // TODO Auto-generated method stub
-        return super.whenApplication(application);
+        EsonValue operator = application.getOperator().on(this);
+        EsonValue operand = application.getOperand().on(this);
+        throw new UnsupportedOperationException();
     }
 
     private EsonObject orderByDependence(EsonObject object) {
-        List<DependenceTree<Integer>> pool
-                = new ArrayList<DependenceTree<Integer>>();
-        for (int i = 0; i < object.getContent().size(); ++i) {
-            pool.add(DependenceTree.of(i));
-        }
-        for (int i = 0; i < object.getContent().size(); ++i) {
-            EsonValue value = object.getContent().get(i).getValue();
-            Set<String> dependencies = value.on(GetDependencies.getInstance());
-            for (int j = 0; j < object.getContent().size(); ++j) {
-                String key = object.getContent().get(j).getKey().getName();
-                if (dependencies.contains(key)) {
-                    pool.get(i).depends(pool.get(j));
-                }
-            }
-        }
-        return null;
+        return object;
     }
 
 }

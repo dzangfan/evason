@@ -1,55 +1,55 @@
 package cn.dzangfan.code.data;
 
-import java.util.function.Supplier;
+import java.util.function.Function;
 
 public abstract class CaseFunction<T> {
 
-    Supplier<T> defaultSupplier = () -> null;
+    Function<EsonValue, T> defaultSupplier = (__) -> null;
 
     public CaseFunction() {
     }
 
-    public CaseFunction(Supplier<T> defaultSupplier) {
+    public CaseFunction(Function<EsonValue, T> defaultSupplier) {
         this.defaultSupplier = defaultSupplier;
     }
 
     public T whenSymbol(EsonSymbol symbol) {
-        return defaultSupplier.get();
+        return defaultSupplier.apply(symbol);
     }
 
     public T whenString(EsonString string) {
-        return defaultSupplier.get();
+        return defaultSupplier.apply(string);
     }
 
     public T whenNumber(EsonNumber number) {
-        return defaultSupplier.get();
+        return defaultSupplier.apply(number);
     }
 
     public T whenBoolean(boolean value) {
-        return defaultSupplier.get();
+        return defaultSupplier.apply(EsonSpecialValue.from(value));
     }
 
     public T whenNull() {
-        return defaultSupplier.get();
+        return defaultSupplier.apply(EsonSpecialValue.NULL);
     }
 
     public T whenID(EsonID id) {
-        return defaultSupplier.get();
+        return defaultSupplier.apply(id);
     }
 
     public T whenObject(EsonObject object) {
-        return defaultSupplier.get();
+        return defaultSupplier.apply(object);
     }
 
     public T whenArray(EsonArray array) {
-        return defaultSupplier.get();
+        return defaultSupplier.apply(array);
     }
 
     public T whenLambda(EsonLambda lambda) {
-        return defaultSupplier.get();
+        return defaultSupplier.apply(lambda);
     }
 
     public T whenApplication(EsonApplication application) {
-        return defaultSupplier.get();
+        return defaultSupplier.apply(application);
     }
 }

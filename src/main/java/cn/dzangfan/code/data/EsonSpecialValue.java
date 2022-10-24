@@ -13,6 +13,11 @@ public class EsonSpecialValue extends EsonValue {
     public static final EsonSpecialValue NULL = new EsonSpecialValue();
 
     @Override
+    public boolean isCondition() {
+        return true;
+    }
+
+    @Override
     public <T> T on(CaseFunction<T> function) {
         if (isTrue()) {
             return function.whenBoolean(true);

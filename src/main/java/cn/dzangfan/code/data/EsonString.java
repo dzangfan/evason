@@ -26,4 +26,9 @@ public class EsonString extends EsonValue {
         return function.whenString(this);
     }
 
+    @Override
+    public boolean isCondition() {
+        return true;
+    }
+
 }

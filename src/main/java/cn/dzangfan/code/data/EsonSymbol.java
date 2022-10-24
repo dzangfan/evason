@@ -16,6 +16,11 @@ public class EsonSymbol extends EsonValue {
         this.content = content;
     }
 
+    @Override
+    public boolean isCondition() {
+        return true;
+    }
+
     public static EsonSymbol from(String content) {
         EsonSymbol symbol = symbolPool.get(content);
         if (Objects.nonNull(symbol)) {

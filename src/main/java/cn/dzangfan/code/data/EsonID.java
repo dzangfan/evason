@@ -13,6 +13,11 @@ public class EsonID extends EsonValue {
         return name;
     }
 
+    @Override
+    public boolean isCondition() {
+        return true;
+    }
+
     public void setName(String name) {
         this.name = name;
     }

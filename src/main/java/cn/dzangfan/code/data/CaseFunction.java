@@ -48,4 +48,8 @@ public abstract class CaseFunction<T> {
     public T whenLambda(EsonLambda lambda) {
         return defaultSupplier.get();
     }
+
+    public T whenApplication(EsonApplication application) {
+        return defaultSupplier.get();
+    }
 }

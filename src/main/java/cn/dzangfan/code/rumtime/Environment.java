@@ -1,5 +1,6 @@
 package cn.dzangfan.code.rumtime;
 
+import java.util.Objects;
 import java.util.Optional;
 
 import cn.dzangfan.code.data.EsonID;
@@ -48,12 +49,25 @@ public class Environment {
         }
     }
 
-    public Environment extend() {
+    public Environment extend(SymbolTable table) {
         return new Environment(SymbolTable.newEmpty(), this);
+    }
+
+    public Environment extend() {
+        return extend(SymbolTable.newEmpty());
     }
 
     public boolean isRoot() {
         return ROOT == this;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Environment env && obj != null) {
+            return symbolTable.equals(env.symbolTable)
+                    && Objects.equals(parent, env.parent);
+        } else
+            return false;
     }
 
 }

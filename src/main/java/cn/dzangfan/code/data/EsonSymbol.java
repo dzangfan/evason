@@ -39,4 +39,12 @@ public class EsonSymbol extends EsonValue {
         return function.whenSymbol(this);
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof EsonSymbol symbol && symbol != null) {
+            return content.equals(symbol.content);
+        }
+        return false;
+    }
+
 }

@@ -17,6 +17,15 @@ public class EsonLambda extends EsonValue {
         private EsonValue condition;
         private EsonValue value;
 
+        @Override
+        public boolean equals(Object obj) {
+            if (obj instanceof Branch branch && obj != null) {
+                return condition.equals(branch.condition)
+                        && value.equals(branch.value);
+            } else
+                return false;
+        }
+
         private Branch(EsonValue condition, EsonValue value) {
             super();
             this.condition = condition;
@@ -90,6 +99,15 @@ public class EsonLambda extends EsonValue {
     @Override
     public <T> T on(CaseFunction<T> function) {
         return function.whenLambda(this);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof EsonLambda lambda && obj != null) {
+            return environment.equals(lambda.environment)
+                    && content.equals(lambda.content);
+        } else
+            return false;
     }
 
 }

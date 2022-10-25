@@ -34,4 +34,12 @@ public class EsonArray extends EsonValue {
         return function.whenArray(this);
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof EsonArray array && array != null) {
+            return getContent().equals(array.getContent());
+        }
+        return false;
+    }
+
 }

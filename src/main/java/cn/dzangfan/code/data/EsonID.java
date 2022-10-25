@@ -26,4 +26,12 @@ public class EsonID extends EsonValue {
         return function.whenID(this);
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof EsonID id && id != null) {
+            return getName().equals(id.getName());
+        }
+        return false;
+    }
+
 }

@@ -26,4 +26,12 @@ public class EsonString extends EsonValue {
         return function.whenString(this);
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof EsonString string && string != null) {
+            return content.equals(string.content);
+        }
+        return false;
+    }
+
 }

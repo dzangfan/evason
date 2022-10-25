@@ -3,6 +3,7 @@ package cn.dzangfan.code.rumtime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.BiConsumer;
 
 import cn.dzangfan.code.data.EsonID;
 import cn.dzangfan.code.data.EsonValue;
@@ -38,6 +39,15 @@ public class SymbolTable {
         public void setValue(EsonValue value) {
             this.value = value;
         }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj instanceof Entry entry && obj != null) {
+                return id.equals(entry.id) && value.equals(entry.value);
+            }
+            return false;
+        }
+
     }
 
     private Map<String, Entry> table;
@@ -64,4 +74,21 @@ public class SymbolTable {
         table.put(id.getName(), entry);
         return entry;
     }
+
+    public void forEach(BiConsumer<String, Entry> consumer) {
+        table.forEach(consumer);
+    }
+
+    public int size() {
+        return table.size();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof SymbolTable symbolTable && obj != null) {
+            return table.equals(symbolTable.table);
+        }
+        return false;
+    }
+
 }

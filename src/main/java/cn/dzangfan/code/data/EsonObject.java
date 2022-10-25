@@ -41,6 +41,15 @@ public class EsonObject extends EsonValue {
         public static Entry from(EsonID key, EsonValue value) {
             return new Entry(key, value);
         }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj instanceof Entry entry && entry != null) {
+                return key.equals(entry.key) && value.equals(entry.value);
+            }
+            return false;
+        }
+
     }
 
     public List<Entry> getContent() {
@@ -78,6 +87,14 @@ public class EsonObject extends EsonValue {
         }
         content.add(Entry.from(id, value));
         return value;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof EsonObject object && obj != null) {
+            return content.equals(object.content);
+        }
+        return false;
     }
 
 }

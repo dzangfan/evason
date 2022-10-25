@@ -35,4 +35,13 @@ public class EsonApplication extends EsonValue {
     public <T> T on(CaseFunction<T> function) {
         return function.whenApplication(this);
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof EsonApplication application && obj != null) {
+            return operator.equals(application.operator)
+                    && operand.equals(application.operand);
+        }
+        return false;
+    }
 }

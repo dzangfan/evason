@@ -1,50 +1,45 @@
 grammar Eson;
 
-progLibrary
-:
-    object
-;
-
-progExecutive
-:
-    lambda
-;
-
 value
 :
-    SYMBOL
-    | STRING
-    | NUMBER
-    | SPECIALVALUE
-    | ID
-    | object
-    | array
-    | lambda
-    | application
+    condValue # valueCondValue
+    | lambda # valueLambda
+    | application # valueApplication
+;
+
+condValue
+:
+    SYMBOL # valueSymbol
+    | STRING # valueString
+    | number # valueNumber
+    | SPECIALVALUE # valueSpecial
+    | ID # valueId
+    | object # valueObject
+    | array # valueArray
 ;
 
 array
 :
     '[' value
     (
-        ',' value
+        ','? value
     )*
     (
-        ',' '...' ID
-    )? ']'
-    | '[' ']'
+        ','? '...' ID
+    )? ']' # loadedArray
+    | '[' ']' # emptyArray
 ;
 
 object
 :
     '{' objectPair
     (
-        ',' objectPair
+        ','? objectPair
     )*
     (
-        ',' '...' ID
-    )? '}'
-    | '{' '}'
+        ','? '...' ID
+    )? '}' # loadedObject
+    | '{' '}' # emptyObject
 ;
 
 lambda
@@ -55,20 +50,24 @@ lambda
     )* '#'
 ;
 
-application
-:
-    '(' value+ ')'
-;
-
 valueMap
 :
-    value '=>' value
+    condValue '=>' value # valueMapNormal
+    | '(' params += condValue params += condValue+ ')' '=>' result = value #
+    valueMapShortcut
+;
+
+application
+:
+    '(' value value+ ')'
 ;
 
 objectPair
 :
-    ID ':' value
-    | ID
+    ID
+    (
+        ':' value
+    )?
 ;
 
 SYMBOL
@@ -85,9 +84,10 @@ STRING
     )* '"'
 ;
 
-NUMBER
+number
 :
-    '-'? INTEGER
+    '-'? INTEGER # integerNumber
+    | '-'? DOUBLE # doubleNumber
 ;
 
 SPECIALVALUE
@@ -124,11 +124,35 @@ HEXCHAR
     [0-9a-fA-F]
 ;
 
-fragment
 INTEGER
 :
     '0'
-    | [1-9] [0-9]+
+    | [1-9] [0-9]*
+;
+
+fragment
+DIGITS
+:
+    [0-9]+
+;
+
+DOUBLE
+:
+    INTEGER FRACTION
+    | INTEGER EXPONENT
+    | INTEGER FRACTION EXPONENT
+;
+
+fragment
+FRACTION
+:
+    '.' DIGITS
+;
+
+fragment
+EXPONENT
+:
+    [eE] [-+]? DIGITS
 ;
 
 WS

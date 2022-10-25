@@ -168,4 +168,38 @@ class MatchTest {
         });
     }
 
+    @Test
+    void testWhenObjectWithRest() {
+        EsonValue condition = EsonObject.from(Entry.from("x", EsonID.from("x")))
+                .withRest(EsonID.from("rest"));
+        EsonValue value
+                = EsonObject.from(Entry.from("x", EsonNumber.fromInteger(0)),
+                                  Entry.from("y", EsonNumber.fromInteger(1)),
+                                  Entry.from("z", EsonNumber.fromInteger(2)));
+        SymbolTable table = match(condition, value);
+        assertEquals(EsonNumber.fromInteger(0),
+                     table.get("x").get().getValue());
+        assertEquals(EsonObject.from(Entry.from("y", EsonNumber.fromInteger(1)),
+                                     Entry.from("z",
+                                                EsonNumber.fromInteger(2))),
+                     table.get("rest").get().getValue());
+    }
+
+    @Test
+    void testWhenArrayWithRest() {
+        EsonValue condition = EsonArray.from(EsonID.from("car"))
+                .withRest(EsonID.from("cdr"));
+        EsonValue value = EsonArray
+                .from(EsonNumber.fromInteger(0), EsonNumber.fromInteger(1),
+                      EsonNumber.fromInteger(2), EsonNumber.fromInteger(3),
+                      EsonNumber.fromInteger(4));
+        SymbolTable table = match(condition, value);
+        assertEquals(EsonNumber.fromInteger(0),
+                     table.get("car").get().getValue());
+        assertEquals(EsonArray
+                .from(EsonNumber.fromInteger(1), EsonNumber.fromInteger(2),
+                      EsonNumber.fromInteger(3), EsonNumber.fromInteger(4)),
+                     table.get("cdr").get().getValue());
+    }
+
 }

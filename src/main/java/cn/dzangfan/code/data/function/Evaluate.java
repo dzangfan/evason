@@ -1,5 +1,6 @@
 package cn.dzangfan.code.data.function;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -87,13 +88,43 @@ public class Evaluate extends CaseFunction<EsonValue> {
             }
             newObject.add(entry.getKey(), value);
         }
+        object.getMaybeRest().ifPresent(id -> {
+            id.on(this).on(new ExceptionCaseFunction<List<Entry>>(
+                    GetType.Type.OBJECT) {
+
+                @Override
+                public List<Entry> whenObject(EsonObject object) {
+                    return object.getContent();
+                }
+
+            }).forEach(entry -> {
+                // Only add what haven't appeared
+                if (!newObject.getContent().stream().anyMatch(pEntry -> pEntry
+                        .getKey().getName().equals(entry.getKey().getName()))) {
+                    newObject.getContent().add(entry);
+                }
+            });
+        });
         return newObject;
     }
 
     @Override
     public EsonValue whenArray(EsonArray array) {
-        List<EsonValue> evaluatedContent = array.getContent().stream()
-                .map(value -> value.on(this)).toList();
+        List<EsonValue> evaluatedContent = new ArrayList<EsonValue>(array
+                .getContent().stream().map(value -> value.on(this)).toList());
+        array.getMaybeRest().ifPresent(id -> {
+            List<EsonValue> content
+                    = id.on(this).on(new ExceptionCaseFunction<List<EsonValue>>(
+                            GetType.Type.ARRAY) {
+
+                        @Override
+                        public List<EsonValue> whenArray(EsonArray array) {
+                            return array.getContent();
+                        }
+
+                    });
+            evaluatedContent.addAll(content);
+        });
         return EsonArray.from(evaluatedContent);
     }
 

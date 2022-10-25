@@ -4,10 +4,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 public class EsonObject extends EsonValue {
 
     private List<Entry> content;
+
+    private Optional<EsonID> maybeRest;
 
     public static class Entry {
         private EsonID key;
@@ -61,9 +64,22 @@ public class EsonObject extends EsonValue {
         this.content = content;
     }
 
+    public Optional<EsonID> getMaybeRest() {
+        return maybeRest;
+    }
+
+    public void setMaybeRest(Optional<EsonID> maybeRest) {
+        this.maybeRest = maybeRest;
+    }
+
     private EsonObject(List<Entry> content) {
+        this(content, Optional.empty());
+    }
+
+    private EsonObject(List<Entry> content, Optional<EsonID> maybeRest) {
         super();
         this.content = content;
+        this.maybeRest = maybeRest;
     }
 
     public static EsonObject from(Collection<Entry> content) {
@@ -73,6 +89,14 @@ public class EsonObject extends EsonValue {
     public static EsonObject from(Entry... content) {
         return new EsonObject(
                 new ArrayList<EsonObject.Entry>(Arrays.asList(content)));
+    }
+
+    public EsonObject withRest(EsonID id) {
+        return new EsonObject(content, Optional.of(id));
+    }
+
+    public EsonObject withoutRest() {
+        return new EsonObject(content);
     }
 
     @Override
@@ -94,7 +118,8 @@ public class EsonObject extends EsonValue {
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof EsonObject object && obj != null) {
-            return content.equals(object.content);
+            return content.equals(object.content)
+                    && maybeRest.equals(object.maybeRest);
         }
         return false;
     }

@@ -41,13 +41,14 @@ public class IsFinalValue extends CaseFunction<Boolean> {
 
     @Override
     public Boolean whenObject(EsonObject object) {
-        return object.getContent().stream().map(EsonObject.Entry::getValue)
+        return object.getMaybeRest().isEmpty() && object.getContent().stream()
+                .map(EsonObject.Entry::getValue)
                 .allMatch(value -> value.on(IsFinalValue.getInstance()));
     }
 
     @Override
     public Boolean whenArray(EsonArray array) {
-        return array.getContent().stream()
+        return array.getMaybeRest().isEmpty() && array.getContent().stream()
                 .allMatch(value -> value.on(IsFinalValue.getInstance()));
     }
 

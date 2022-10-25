@@ -44,7 +44,12 @@ class EvaluateTest {
     }
 
     private void evalTo(EsonValue expected, EsonValue value) {
-        EsonValue result = eval(value);
+        evalTo(expected, value, ROOT);
+    }
+
+    private void evalTo(EsonValue expected, EsonValue value,
+                        Environment environment) {
+        EsonValue result = eval(value, environment);
         assertEquals(expected, result);
     }
 
@@ -217,6 +222,37 @@ class EvaluateTest {
                 = EsonApplication.from(innerApp, EsonString.from("/X11"));
         applyTo(localEnvironment, EsonString.from("/usr/bin/X11/X11/X11"),
                 outerApp, EsonString.from("/X11"));
+    }
+
+    @Test
+    void testWhenObjectWithRest() throws EsonRedefinitionException {
+        Environment localEnvironment = ROOT.extend();
+        localEnvironment.define(EsonID.from("rest"), EsonObject
+                .from(Entry.from("y", EsonNumber.fromInteger(10)),
+                      Entry.from("z", EsonNumber.fromInteger(2))));
+        EsonObject object = EsonObject
+                .from(Entry.from("x", EsonNumber.fromInteger(0)),
+                      Entry.from("y", EsonNumber.fromInteger(1)))
+                .withRest(EsonID.from("rest"));
+        evalTo(EsonObject.from(Entry.from("x", EsonNumber.fromInteger(0)),
+                               Entry.from("y", EsonNumber.fromInteger(1)),
+                               Entry.from("z", EsonNumber.fromInteger(2))),
+               object, localEnvironment);
+    }
+
+    @Test
+    void testWhenArrayWithRest() throws EsonRedefinitionException {
+        Environment localEnvironment = ROOT.extend();
+        localEnvironment.define(EsonID.from("rest"), EsonArray
+                .from(EsonNumber.fromInteger(1), EsonNumber.fromInteger(2),
+                      EsonNumber.fromInteger(3), EsonNumber.fromInteger(4)));
+        EsonArray array = EsonArray.from(EsonNumber.fromInteger(0))
+                .withRest(EsonID.from("rest"));
+        evalTo(EsonArray
+                .from(EsonNumber.fromInteger(0), EsonNumber.fromInteger(1),
+                      EsonNumber.fromInteger(2), EsonNumber.fromInteger(3),
+                      EsonNumber.fromInteger(4)),
+               array, localEnvironment);
     }
 
 }

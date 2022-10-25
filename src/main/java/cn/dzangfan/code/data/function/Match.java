@@ -1,6 +1,10 @@
 package cn.dzangfan.code.data.function;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import cn.dzangfan.code.data.CaseFunction;
 import cn.dzangfan.code.data.EsonApplication;
@@ -197,6 +201,15 @@ public class Match extends CaseFunction<Match.Result> {
 
                 SymbolTable symbolTable = SymbolTable.newEmpty();
 
+                boolean needCollectRest = condObject.getMaybeRest().isPresent();
+
+                Set<String> unusedFields
+                        = needCollectRest
+                                ? valObject.getContent().stream()
+                                        .map(entry -> entry.getKey().getName())
+                                        .collect(Collectors.toSet())
+                                : null;
+
                 for (Entry condEntry : condObject.getContent()) {
                     Optional<Entry> maybeValEntry = valObject.getContent()
                             .stream()
@@ -224,6 +237,26 @@ public class Match extends CaseFunction<Match.Result> {
                         }
                         symbolTable.put(entry.getId(), entry.getValue());
                     });
+                    if (needCollectRest) {
+                        unusedFields.remove(condEntry.getKey().getName());
+                    }
+                }
+
+                if (needCollectRest) {
+                    String restName = condObject.getMaybeRest().get().getName();
+                    if (symbolTable.isDefined(restName)) {
+                        EsonRedefinitionException e
+                                = new EsonRedefinitionException(
+                                        symbolTable.get(restName).get().getId(),
+                                        condObject.getMaybeRest().get());
+                        throw EsonRuntimeException.causedBy(e);
+                    }
+                    List<Entry> restContent = valObject.getContent().stream()
+                            .filter(entry -> unusedFields
+                                    .contains(entry.getKey().getName()))
+                            .toList();
+                    symbolTable.put(condObject.getMaybeRest().get(),
+                                    EsonObject.from(restContent));
                 }
 
                 return Result.matched(symbolTable);
@@ -238,32 +271,58 @@ public class Match extends CaseFunction<Match.Result> {
 
             @Override
             public Result whenArray(EsonArray condArray) {
-                if (valArray.getContent().size() != condArray.getContent()
-                        .size()) {
+                boolean needCollectRest = condArray.getMaybeRest().isPresent();
+                if ((!needCollectRest && condArray.getContent()
+                        .size() != valArray.getContent().size())
+                        || (needCollectRest && condArray.getContent()
+                                .size() > valArray.getContent().size())) {
                     return Result.unmatched();
                 }
+
+                List<EsonValue> restContent
+                        = needCollectRest ? new ArrayList<EsonValue>() : null;
+
                 SymbolTable symbolTable = SymbolTable.newEmpty();
                 for (int i = 0; i < valArray.getContent().size(); ++i) {
-                    EsonValue condition = condArray.getContent().get(i);
-                    EsonValue value = valArray.getContent().get(i);
-                    Result result = value.on(Match.withEnsured(condition));
-                    if (!result.isMatched()) {
-                        return Result.unmatched();
-                    }
-                    result.getSymbolTable().forEach((name, entry) -> {
-                        if (symbolTable.isDefined(name)) {
-                            EsonRedefinitionException e
-                                    = new EsonRedefinitionException(
-                                            symbolTable.get(name).get().getId(),
-                                            entry.getId());
-                            EsonRuntimeException re
-                                    = new EsonRuntimeException();
-                            re.initCause(e);
-                            throw re;
+                    if (i < condArray.getContent().size()) {
+                        EsonValue condition = condArray.getContent().get(i);
+                        EsonValue value = valArray.getContent().get(i);
+                        Result result = value.on(Match.withEnsured(condition));
+                        if (!result.isMatched()) {
+                            return Result.unmatched();
                         }
-                        symbolTable.put(entry.getId(), entry.getValue());
-                    });
+                        result.getSymbolTable().forEach((name, entry) -> {
+                            if (symbolTable.isDefined(name)) {
+                                EsonRedefinitionException e
+                                        = new EsonRedefinitionException(
+                                                symbolTable.get(name).get()
+                                                        .getId(),
+                                                entry.getId());
+                                EsonRuntimeException re
+                                        = new EsonRuntimeException();
+                                re.initCause(e);
+                                throw re;
+                            }
+                            symbolTable.put(entry.getId(), entry.getValue());
+                        });
+                    } else {
+                        restContent.add(valArray.getContent().get(i));
+                    }
                 }
+
+                if (needCollectRest) {
+                    String restName = condArray.getMaybeRest().get().getName();
+                    if (symbolTable.isDefined(restName)) {
+                        EsonRedefinitionException e
+                                = new EsonRedefinitionException(
+                                        symbolTable.get(restName).get().getId(),
+                                        condArray.getMaybeRest().get());
+                        throw EsonRuntimeException.causedBy(e);
+                    }
+                    symbolTable.put(condArray.getMaybeRest().get(),
+                                    EsonArray.from(restContent));
+                }
+
                 return Result.matched(symbolTable);
             }
 

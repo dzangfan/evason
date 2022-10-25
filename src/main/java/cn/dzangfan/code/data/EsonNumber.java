@@ -48,4 +48,8 @@ public class EsonNumber extends EsonValue {
         return false;
     }
 
+    public int floor() {
+        return (int) Math.floor(value);
+    }
+
 }

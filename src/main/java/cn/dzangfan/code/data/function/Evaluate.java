@@ -1,6 +1,7 @@
 package cn.dzangfan.code.data.function;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 import cn.dzangfan.code.data.CaseFunction;
 import cn.dzangfan.code.data.EsonApplication;
@@ -72,10 +73,9 @@ public class Evaluate extends CaseFunction<EsonValue> {
 
     @Override
     public EsonValue whenObject(EsonObject object) {
-        EsonObject orderedObject = orderByDependence(object);
         Environment localEnvironment = environment.extend();
         EsonObject newObject = EsonObject.from();
-        for (Entry entry : orderedObject.getContent()) {
+        for (Entry entry : object.getContent()) {
             EsonValue value
                     = entry.getValue().on(Evaluate.in(localEnvironment));
             try {
@@ -99,18 +99,15 @@ public class Evaluate extends CaseFunction<EsonValue> {
 
     @Override
     public EsonValue whenLambda(EsonLambda lambda) {
-        return lambda;
+        return lambda.in(environment);
     }
 
     @Override
     public EsonValue whenApplication(EsonApplication application) {
         EsonValue operator = application.getOperator().on(this);
-        EsonValue operand = application.getOperand().on(this);
-        throw new UnsupportedOperationException();
-    }
-
-    private EsonObject orderByDependence(EsonObject object) {
-        return object;
+        Supplier<EsonValue> operandSupplier
+                = () -> application.getOperand().on(this);
+        return operator.on(Apply.to(operandSupplier));
     }
 
 }

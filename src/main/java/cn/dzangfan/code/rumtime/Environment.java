@@ -50,7 +50,7 @@ public class Environment {
     }
 
     public Environment extend(SymbolTable table) {
-        return new Environment(SymbolTable.newEmpty(), this);
+        return new Environment(table, this);
     }
 
     public Environment extend() {

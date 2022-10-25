@@ -1,5 +1,6 @@
 package cn.dzangfan.code.data;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -70,7 +71,8 @@ public class EsonObject extends EsonValue {
     }
 
     public static EsonObject from(Entry... content) {
-        return new EsonObject(Arrays.asList(content));
+        return new EsonObject(
+                new ArrayList<EsonObject.Entry>(Arrays.asList(content)));
     }
 
     @Override

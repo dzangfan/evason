@@ -4,7 +4,12 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import cn.dzangfan.code.data.function.Evaluate;
 import cn.dzangfan.code.data.function.IsCondition;
+import cn.dzangfan.code.data.function.Match;
+import cn.dzangfan.code.exn.EsonException;
+import cn.dzangfan.code.exn.EsonRuntimeException;
+import cn.dzangfan.code.exn.EsonUnmatchedCaseException;
 import cn.dzangfan.code.rumtime.Environment;
 
 public class EsonLambda extends EsonValue {
@@ -108,6 +113,23 @@ public class EsonLambda extends EsonValue {
                     && content.equals(lambda.content);
         } else
             return false;
+    }
+
+    public EsonValue apply(EsonValue operand) {
+        try {
+            for (Branch branch : content) {
+                Match.Result result
+                        = operand.on(Match.with(branch.getCondition()));
+                if (result.isMatched()) {
+                    Environment localEnvironment
+                            = environment.extend(result.getSymbolTable());
+                    return branch.value.on(Evaluate.in(localEnvironment));
+                }
+            }
+            throw new EsonUnmatchedCaseException(this, operand);
+        } catch (EsonException e) {
+            throw EsonRuntimeException.causedBy(e);
+        }
     }
 
 }

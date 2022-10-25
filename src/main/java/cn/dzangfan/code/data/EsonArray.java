@@ -1,5 +1,6 @@
 package cn.dzangfan.code.data;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -18,7 +19,7 @@ public class EsonArray extends EsonValue {
     }
 
     public static EsonArray from(EsonValue... content) {
-        return new EsonArray(Arrays.asList(content));
+        return new EsonArray(new ArrayList<EsonValue>(Arrays.asList(content)));
     }
 
     public List<EsonValue> getContent() {

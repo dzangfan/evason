@@ -5,10 +5,13 @@ import java.util.Collection;
 import java.util.List;
 
 import cn.dzangfan.code.data.function.IsCondition;
+import cn.dzangfan.code.rumtime.Environment;
 
 public class EsonLambda extends EsonValue {
 
     private List<Branch> content;
+
+    private Environment environment;
 
     public static class Branch {
         private EsonValue condition;
@@ -47,8 +50,13 @@ public class EsonLambda extends EsonValue {
     }
 
     private EsonLambda(List<Branch> content) {
+        this(content, Environment.ROOT);
+    }
+
+    private EsonLambda(List<Branch> content, Environment environment) {
         super();
         this.content = content;
+        this.environment = environment;
     }
 
     public static EsonLambda from(Collection<Branch> content) {
@@ -59,12 +67,24 @@ public class EsonLambda extends EsonValue {
         return new EsonLambda(Arrays.asList(content));
     }
 
+    public EsonLambda in(Environment environment) {
+        return new EsonLambda(content, environment);
+    }
+
     public List<Branch> getContent() {
         return content;
     }
 
     public void setContent(List<Branch> content) {
         this.content = content;
+    }
+
+    public Environment getEnvironment() {
+        return environment;
+    }
+
+    public void setEnvironment(Environment environment) {
+        this.environment = environment;
     }
 
     @Override

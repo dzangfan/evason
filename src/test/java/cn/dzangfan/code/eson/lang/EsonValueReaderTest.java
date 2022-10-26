@@ -88,7 +88,7 @@ class EsonValueReaderTest {
                                  EsonSpecialValue.NULL);
         read("[true, is, null]", array);
         read("[true is null]", array);
-        read("[true is null ...sigh", array.withRest(EsonID.from("sigh")));
+        read("[true is null ...sigh]", array.withRest(EsonID.from("sigh")));
         read("[true is null, ...sign]", array.withRest(EsonID.from("sign")));
     }
 

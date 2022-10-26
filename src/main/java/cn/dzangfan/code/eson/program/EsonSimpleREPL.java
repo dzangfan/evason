@@ -12,14 +12,19 @@ import java.util.function.Supplier;
 
 import cn.dzangfan.code.eson.data.CaseFunction;
 import cn.dzangfan.code.eson.data.EsonID;
+import cn.dzangfan.code.eson.data.EsonObject;
+import cn.dzangfan.code.eson.data.EsonObject.Entry;
 import cn.dzangfan.code.eson.data.EsonSymbol;
 import cn.dzangfan.code.eson.data.EsonValue;
 import cn.dzangfan.code.eson.data.function.Evaluate;
+import cn.dzangfan.code.eson.data.function.ExceptionCaseFunction;
+import cn.dzangfan.code.eson.data.function.GetType;
 import cn.dzangfan.code.eson.data.function.PrettyPrint;
 import cn.dzangfan.code.eson.exn.EsonRedefinitionException;
 import cn.dzangfan.code.eson.exn.EsonRuntimeException;
 import cn.dzangfan.code.eson.exn.EsonSyntaxException;
 import cn.dzangfan.code.eson.exn.EsonUndefinedIDException;
+import cn.dzangfan.code.eson.lang.EsonScriptLoader;
 import cn.dzangfan.code.eson.lang.EsonValueReader;
 import cn.dzangfan.code.eson.rumtime.Environment;
 
@@ -28,6 +33,7 @@ public class EsonSimpleREPL {
     public static void main(String[] args) {
         Environment environment = Environment.ROOT.extend();
         EsonSimpleREPL repl = new EsonSimpleREPL(System.in, environment);
+        repl.loadScripts(args);
         RunMetaCommand runMetaCommand
                 = new RunMetaCommand(repl::storeValue, () -> {
                     repl.historyNameList.stream().forEach(name -> {
@@ -72,6 +78,8 @@ public class EsonSimpleREPL {
     private List<String> historyNameList = new ArrayList<String>();
 
     private int resultCounter = 0;
+
+    private EsonScriptLoader scriptLoader = EsonScriptLoader.getInstance();
 
     private EsonSimpleREPL(InputStream inputStream, Environment environment) {
         super();
@@ -164,5 +172,45 @@ public class EsonSimpleREPL {
             return false;
         }
 
+    }
+
+    private void loadScripts(String[] args) {
+        for (String path : args) {
+            try {
+                scriptLoader.load(path, environment)
+                        .on(new ExceptionCaseFunction<EsonValue>(
+                                GetType.Type.OBJECT) {
+
+                            @Override
+                            public EsonValue whenObject(EsonObject object) {
+                                for (Entry entry : object.getContent()) {
+                                    try {
+                                        /**
+                                         * [WARN] Have not considered
+                                         * consistency. So if a redefinition
+                                         * exception were raised in half of
+                                         * evaluation, the defined symbols in
+                                         * the script will not be erased.
+                                         */
+                                        environment.define(entry.getKey(),
+                                                           entry.getValue());
+                                    } catch (EsonRedefinitionException e) {
+                                        throw EsonRuntimeException.causedBy(e);
+                                    }
+                                }
+                                return object;
+                            }
+
+                        });
+            } catch (EsonRuntimeException e) {
+                System.out.printf("A error has been raised in script %s\n",
+                                  path);
+                String message = e.getCause().getMessage();
+                message = message == null ? "Oops..." : message;
+                System.out.printf("RUNTIME ERROR: %s\n", message);
+            } catch (Exception e) {
+                System.out.printf("UNKNOWN ERROR: %s\n", e.getMessage());
+            }
+        }
     }
 }

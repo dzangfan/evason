@@ -47,14 +47,23 @@
    </plugin>
    <plugin>
     <groupId>org.apache.maven.plugins</groupId>
-    <artifactId>maven-jar-plugin</artifactId>
-    <version>3.3.0</version>
+    <artifactId>maven-shade-plugin</artifactId>
+    <version>3.4.0</version>
+    <executions>
+     <execution>
+      <phase>package</phase>
+      <goals>
+       <goal>shade</goal>
+      </goals>
+     </execution>
+    </executions>
     <configuration>
-     <archive>
-      <manifest>
+     <transformers>
+      <transformer
+       implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
        <mainClass>cn.dzangfan.code.eson.program.EsonSimpleREPL</mainClass>
-      </manifest>
-     </archive>
+      </transformer>
+     </transformers>
     </configuration>
    </plugin>
   </plugins>

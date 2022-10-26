@@ -54,7 +54,10 @@ public class EsonSimpleREPL {
                     return 0;
                 });
         String message = "Evason Simple REPL\n"
-                + "Several special  results are used as meta commands\n"
+                + "Press character ';' + <enter> to evaluate\n"
+                + "Use command line arguments to load a .eson library\n"
+                + "  e.g. java -jar evason.jar mylibrary.eson yourlibrary.eson\n"
+                + "Several special results are used as meta commands\n"
                 + "  1. 'exit: Exit from REPL\n"
                 + "  2. 'history: Show evaluated results history\n\n";
         System.out.println(message);

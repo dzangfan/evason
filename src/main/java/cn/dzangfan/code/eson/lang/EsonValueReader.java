@@ -6,9 +6,11 @@ import java.io.InputStream;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.LexerNoViableAltException;
 import org.antlr.v4.runtime.tree.ParseTree;
 
 import cn.dzangfan.code.eson.data.EsonValue;
+import cn.dzangfan.code.eson.exn.EsonRuntimeException;
 import cn.dzangfan.code.lang.EsonLexer;
 import cn.dzangfan.code.lang.EsonParser;
 import cn.dzangfan.code.lang.EsonVisitor;
@@ -36,9 +38,17 @@ public class EsonValueReader {
     }
 
     public EsonValue toEsonValue() {
-        EsonLexer esonLexer = new EsonLexer(charStream);
+        EsonLexer esonLexer = new EsonLexer(charStream) {
+
+            @Override
+            public void recover(LexerNoViableAltException e) {
+                throw EsonRuntimeException.causedBy(e);
+            }
+
+        };
         CommonTokenStream tokenStream = new CommonTokenStream(esonLexer);
         EsonParser esonParser = new EsonParser(tokenStream);
+        esonParser.setErrorHandler(new EsonBailErrorStrategy());
         ParseTree parseTree = esonParser.value();
         return visitor.visit(parseTree);
     }

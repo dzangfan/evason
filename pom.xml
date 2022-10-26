@@ -21,6 +21,11 @@
    <version>5.9.1</version>
    <scope>test</scope>
   </dependency>
+  <dependency>
+   <groupId>args4j</groupId>
+   <artifactId>args4j</artifactId>
+   <version>2.33</version>
+  </dependency>
  </dependencies>
  <build>
   <plugins>
@@ -39,6 +44,18 @@
       </goals>
      </execution>
     </executions>
+   </plugin>
+   <plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-jar-plugin</artifactId>
+    <version>3.3.0</version>
+    <configuration>
+     <archive>
+      <manifest>
+       <mainClass>cn.dzangfan.code.eson.program.EsonSimpleREPL</mainClass>
+      </manifest>
+     </archive>
+    </configuration>
    </plugin>
   </plugins>
  </build>

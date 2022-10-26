@@ -1,6 +1,7 @@
 package cn.dzangfan.code.eson.program;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -17,6 +18,7 @@ import cn.dzangfan.code.eson.data.function.Evaluate;
 import cn.dzangfan.code.eson.data.function.PrettyPrint;
 import cn.dzangfan.code.eson.exn.EsonRedefinitionException;
 import cn.dzangfan.code.eson.exn.EsonRuntimeException;
+import cn.dzangfan.code.eson.exn.EsonSyntaxException;
 import cn.dzangfan.code.eson.exn.EsonUndefinedIDException;
 import cn.dzangfan.code.eson.lang.EsonValueReader;
 import cn.dzangfan.code.eson.rumtime.Environment;
@@ -78,13 +80,33 @@ public class EsonSimpleREPL {
         this.environment = environment;
     }
 
+    private String read() throws IOException {
+        StringBuilder sb = new StringBuilder();
+        do {
+            int nextCodepoint = reader.read();
+            if (nextCodepoint == -1) {
+                System.exit(1);
+            }
+            char nextChar = (char) nextCodepoint;
+            if (nextChar == ';') {
+                return sb.toString();
+            } else {
+                sb.append(nextChar);
+            }
+        } while (true);
+    }
+
     private Optional<EsonValue> readAndEvaluate() {
         try {
-            String line = reader.readLine();
+            String line = read();
             EsonValue value = EsonValueReader.from(line).toEsonValue();
+            if (value == null) {
+                throw EsonRuntimeException.causedBy(new EsonSyntaxException());
+            }
             return Optional.of(value.on(evaluate));
         } catch (EsonRuntimeException e) {
             String message = e.getCause().getMessage();
+            message = message == null ? "Oops..." : message;
             System.out.printf("RUNTIME ERROR: %s\n", message);
         } catch (Exception e) {
             String message = e.getMessage();

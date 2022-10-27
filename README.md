@@ -32,7 +32,7 @@ In this example, `# x => null #` is a constant function that always returns `nul
 
 ### Pattern Matching
 
-Pattern matching is a frequently used method to identify and destructure data in functional programming. See our first example in this page for its usage.
+Pattern matching is a frequently used method to identify and destruct data in functional programming. See our first example in this page for its usage.
 
 Pattern matching in Evason is bascially "work as you are thinking". It appears and can only appear in parameter part of a lambda expression, namely the left of `=>`. Here is some basic rules of matching:
 
@@ -62,7 +62,7 @@ A function can only be applied by exactly one argument. But you can "chain" lamb
 , result: (((take3 "Where") "is") "Alice") }
 ```
 
-This feature, called [currying](https://en.wikipedia.org/wiki/Currying), is common is functional programing partially because of its flexibility of cooperate with other functions. For example, we can easily define a new function by provide some but not all arguments to `take3`:
+This feature, called [currying](https://en.wikipedia.org/wiki/Currying), is common is functional programing partially because of its flexibility of cooperating with other functions. For example, we can easily define a new function by provide some but not all arguments to `take3`:
 
 ```javascript
 { whereIs: ((take3 "Where") "is")

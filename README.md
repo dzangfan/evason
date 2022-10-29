@@ -174,7 +174,7 @@ equal to
 
 ### T: `if`, `else if` and `else`
 
-To express mutiple condition, you can just pass a condition selection as the second argument of a condition selection. Recall that boolean value itself can be used as a operator:
+To express mutiple conditions, you can just pass a condition selection as the second argument of a condition selection. Recall that boolean value itself can be used as a operator:
 
 ```scheme
 { Joe: { name: "Joe", age: 1000 }
@@ -188,7 +188,7 @@ To express mutiple condition, you can just pass a condition selection as the sec
 
 If you think this code is obscure, ambiguous, and unacceptable, here is another version:
 
-```scheme
+```javascript
 { compose: # (f g x) => (f (g x)) #
 , try: # first => { or: # next => (try (compose first next)) #
                   , else: first

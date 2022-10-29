@@ -32,16 +32,16 @@ In this example, `# x => null #` is a constant function that always returns `nul
 
 ### Pattern Matching
 
-Pattern matching is a frequently used method to identify and destructure data in functional programming. See our first example in this page for its usage.
+Pattern matching is a frequently used method to identify and extract data in functional programming. See our first example in this page for its usage.
 
-Pattern matching in Evason is bascially "work as you are thinking". It appears and can only appear in parameter part of a lambda expression, namely the left of `=>`. Here is some basic rules of matching:
+Pattern matching in Evason is basically "work as you are thinking". It appears and can only appear in parameter part of a lambda expression, namely the left of `=>`. Here is some basic rules of matching:
 
 1. Primitive values, like `1`, `"string"`, and `true`, match exactly with themselves.
 2. Compound values, like `{ x: 10 }`, `[1, 2]`, match with another when they have the same type and each field is matching. Specially, a pattern of object can match an object whose fields is a "superset" of the pattern.
 3. A variable in pattern can match everything, and the matched value can be refered in the body of lambda expression.
 4. lambda and application cannot appear in pattern, and therefore they cannot match anything.
 
-Borrowed from JavaScript, we use `...` + `variable` to match "rest" components of a object or an array. They should only appear in the end. Furthremore, since code like `{ x: x }` is so common in Evason, it can be simplified to `{ x }`. Here is a example:
+Borrowed from JavaScript, we use `...` + `variable` to match "rest" components of a object or an array. They should only appear in the end. Furthermore, since code like `{ x: x }` is so common in Evason, it can be simplified to `{ x }`. Here is a example:
 
 ```javascript
 { map: # { fun, list: [] } => []
@@ -62,7 +62,7 @@ A function can only be applied by exactly one argument. But you can "chain" lamb
 , result: (((take3 "Where") "is") "Alice") }
 ```
 
-This feature, called [currying](https://en.wikipedia.org/wiki/Currying), is common is functional programing partially because of its flexibility of cooperate with other functions. For example, we can easily define a new function by provide some but not all arguments to `take3`:
+This feature, called [currying](https://en.wikipedia.org/wiki/Currying), is common is functional programming partially because of its flexibility of cooperate with other functions. For example, we can easily define a new function by provide some but not all arguments to `take3`:
 
 ```javascript
 { whereIs: ((take3 "Where") "is")
@@ -76,7 +76,7 @@ or pass it to `map` directly, which we have defined in previous section:
      , list: [ "Alice", "Bob", "Carol" ]})
 ```
 
-However, notations like `# a => b => c => ... ###` and `(((f a) b) c)` is very annoying. Evason supports a syntax suger for the currying which looks like `# (a b c) => ... #` and `(f a b c)`. So examples above can be written in the following way, which has exactly equal effect:
+However, notations like `# a => b => c => ... ###` and `(((f a) b) c)` is very annoying. Evason supports a syntax sugar for the currying which looks like `# (a b c) => ... #` and `(f a b c)`. So examples above can be written in the following way, which has exactly equal effect:
 
 ```javascript
 { take3: # (x y z) => [x, y, z] #
@@ -86,7 +86,7 @@ However, notations like `# a => b => c => ... ###` and `(((f a) b) c)` is very a
 
 ### World of Function
 
-Everything in Evason is a function, even including primitive data type like string and number. The specific meaning depends on specfic data type. You have been famaliar with data type `lambda`, but before we introduce functional meanings of other types, we would like to show you another (and the last) data type that Evason added to JSON -- Symbol. A symbol is basically a string, denoted by `'name`. Like many languages supporting meta-programming, which is using symbol as meta data, Evason always use symbols to denote field of object or concept of `enum` in languages like C or Java. Here is other meanings of data types when they are used as a function:
+Everything in Evason is a function, even including primitive data type like string and number. The specific meaning depends on specfic data type. You have been familiar with data type `lambda`, but before we introduce functional meanings of other types, we would like to show you another (and the last) data type that Evason added to JSON -- Symbol. A symbol is basically a string, denoted by `'name`. Like many languages supporting meta-programming, which is using symbol as meta data, Evason always use symbols to denote field of object or concept of `enum` in languages like C or Java. Here is other meanings of data types when they are used as a function:
 
 - Object: Take a symbol as a field name, return the corresponding value in the object.
   + e.g. `({ x: 10, y: 20 } 'x)` = `10`
@@ -108,7 +108,7 @@ Note that because of the currying, when used as a function, some data types can 
 - `("Where " "are " "you?")` = `"Where are you?"`
 - `([{ name: "Alice" }, { name: "Bob" }, { name: "Carol" }] 1 'name)` = `"Bob"`
 
-### Some Suger
+### Other Sugar
 
 BIIIIG NEWS!! Comma(,) in JSON is syntactic OPTIONAL! Well, I know it is not that amazing actually, but this fact can simplify your typing somewhat. In one word, in Evason, all comma is optional. So `[a, b, c]` is exactly equal to `[a b c]`.
 
@@ -118,27 +118,27 @@ BIIIIG NEWS!! Comma(,) in JSON is syntactic OPTIONAL! Well, I know it is not tha
 
 ## PAQ
 
-This is some answers for possibly asked questions, and some technology may be useful if you want to use Evason to program. Note that since Evason borrowed JavaScripts syntactic highlight (currently), we use `//` as the comment notation in following sections.
+This is some answers for possibly asked questions, and some technology may be useful if you want to use Evason to program. Note that since Evason borrowed Scheme's syntactic highlight (currently), we will use `;;` as the comment notation in following sections.
 
 ### Q: How to declare local variables?
 
 There is two styles of local variables, I call them `let`-style and `where`-style, you can call them poor man's local variables:
 
-```javascript
-// let x = 10
-//     y = 20
-// in [x, y]
+```scheme
+;; let x = 10
+;;     y = 20
+;; in [x, y]
 ({ x: 10
  , y: 20
  , result: [x, y]
  } 'result)
 ```
 
-```javascript
-// [x, y]
-// where
-//   x = 10
-//   y = 20
+```scheme
+;; [x, y]
+;; where
+;;   x = 10
+;;   y = 20
 (# {x y} => [x y] #
  { x: 10
  , y: 20})
@@ -148,7 +148,7 @@ There is two styles of local variables, I call them `let`-style and `where`-styl
 
 By defining following function, you can get a exclusive expreience of step-by-step computation. Subscribe now!
 
-```javascript
+```scheme
 {
   begin: # init => { then: # fun => (begin (fun done)) #
                    , done: init }
@@ -168,6 +168,43 @@ Usage:
 
 equal to
 
-```javascript
+```scheme
 "On an exceptionally hot evening a young man came out of a garret"
+```
+
+### T: `if`, `else if` and `else`
+
+To express mutiple condition, you can just pass a condition selection as the second argument of a condition selection. Recall that boolean value itself can be used as a operator:
+
+```scheme
+{ Joe: { name: "Joe", age: 1000 }
+, ageRange: # { age } => ((lessThan age 18) 'child
+                           ((lessThan age 60) 'adult
+                                              'old))
+            #
+, result: (ageRange Joe)
+}
+```
+
+If you think this code is obscure, ambiguous, and unacceptable, here is another version:
+
+```scheme
+{ compose: # (f g x) => (f (g x)) #
+, try: # first => { or: # next => (try (compose first next)) #
+                  , else: first
+                  }
+       #
+}
+```
+
+`compose` is a auxiliary operation which combines two function together, `try` takes a chain of partial condition application and choose the right one:
+
+```scheme
+{ Joe: { name: "Joe", age: 22 }
+, ageRange: # { age } => (try ((lessThan age 18) 'child)
+                          'or ((lessThan age 60) 'adult)
+                          'else                  'old)
+            #
+, result: (ageRange Joe)
+}
 ```

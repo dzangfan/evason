@@ -91,4 +91,8 @@ public class SymbolTable {
         return false;
     }
 
+    public Map<String, Entry> getTable() {
+        return table;
+    }
+
 }

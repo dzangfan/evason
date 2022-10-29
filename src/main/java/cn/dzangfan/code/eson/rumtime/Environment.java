@@ -1,7 +1,9 @@
 package cn.dzangfan.code.eson.rumtime;
 
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 import cn.dzangfan.code.eson.data.EsonID;
 import cn.dzangfan.code.eson.data.EsonValue;
@@ -66,6 +68,24 @@ public class Environment {
         if (obj instanceof Environment env && obj != null) {
             return symbolTable.equals(env.symbolTable)
                     && Objects.equals(parent, env.parent);
+        } else
+            return false;
+    }
+
+    public Set<String> getVariables() {
+        Set<String> variables = new HashSet<String>();
+        variables.addAll(symbolTable.getTable().keySet());
+        if (this != ROOT) {
+            variables.addAll(getParent().getVariables());
+        }
+        return variables;
+    }
+
+    public boolean isDefined(String name) {
+        if (symbolTable.isDefined(name)) {
+            return true;
+        } else if (this != ROOT) {
+            return getParent().isDefined(name);
         } else
             return false;
     }

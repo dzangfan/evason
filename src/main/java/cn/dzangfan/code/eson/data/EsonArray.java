@@ -6,6 +6,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
+import cn.dzangfan.code.eson.exn.EsonRuntimeException;
+
 public class EsonArray extends EsonValue {
 
     private List<EsonValue> content;
@@ -66,6 +68,14 @@ public class EsonArray extends EsonValue {
                     && maybeRest.equals(array.maybeRest);
         }
         return false;
+    }
+
+    public EsonValue get(int index) {
+        try {
+            return content.get(index);
+        } catch (IndexOutOfBoundsException e) {
+            throw EsonRuntimeException.causedBy(e);
+        }
     }
 
 }

@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -16,6 +17,7 @@ import cn.dzangfan.code.eson.data.EsonObject;
 import cn.dzangfan.code.eson.data.EsonObject.Entry;
 import cn.dzangfan.code.eson.data.EsonSymbol;
 import cn.dzangfan.code.eson.data.EsonValue;
+import cn.dzangfan.code.eson.data.function.CheckType;
 import cn.dzangfan.code.eson.data.function.Evaluate;
 import cn.dzangfan.code.eson.data.function.ExceptionCaseFunction;
 import cn.dzangfan.code.eson.data.function.GetType;
@@ -26,40 +28,29 @@ import cn.dzangfan.code.eson.exn.EsonSyntaxException;
 import cn.dzangfan.code.eson.exn.EsonUndefinedIDException;
 import cn.dzangfan.code.eson.lang.EsonScriptLoader;
 import cn.dzangfan.code.eson.lang.EsonValueReader;
+import cn.dzangfan.code.eson.lib.EsonBaseLib;
+import cn.dzangfan.code.eson.lib.EsonLib;
 import cn.dzangfan.code.eson.rumtime.Environment;
 
 public class EsonSimpleREPL {
 
+    private List<EsonLib> javaLibs = List.of(new EsonBaseLib());
+
     public static void main(String[] args) {
         Environment environment = Environment.ROOT.extend();
         EsonSimpleREPL repl = new EsonSimpleREPL(System.in, environment);
+        repl.loadJavaLibs();
+        repl.loadBaseLib();
         repl.loadScripts(args);
-        RunMetaCommand runMetaCommand
-                = new RunMetaCommand(repl::storeValue, () -> {
-                    repl.historyNameList.stream().forEach(name -> {
-                        try {
-                            String prefix = String.format("%s = ", name);
-                            EsonValue value = environment
-                                    .find(EsonID.from(name)).getValue();
-                            List<String> lines = value
-                                    .on(PrettyPrint.from(prefix.length(), 0));
-                            System.out.print(prefix);
-                            lines.stream().forEach(System.out::println);
-                        } catch (EsonUndefinedIDException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
-                        }
-                    });
-                    System.out.println();
-                    return 0;
-                });
+        RunMetaCommand runMetaCommand = repl.defaultRunMetaCommand();
         String message = "Evason Simple REPL\n"
                 + "Press character ';' + <enter> to evaluate\n"
                 + "Use command line arguments to load a .eson library\n"
                 + "  e.g. java -jar evason.jar mylibrary.eson yourlibrary.eson\n"
                 + "Several special results are used as meta commands\n"
                 + "  1. 'exit: Exit from REPL\n"
-                + "  2. 'history: Show evaluated results history\n\n";
+                + "  2. 'history: Show evaluated results history\n"
+                + "  3. 'variables: Show global variables\n\n";
         System.out.println(message);
         while (true) {
             System.out.print(">>> ");
@@ -142,20 +133,48 @@ public class EsonSimpleREPL {
                 + "because all possible names has been used");
     }
 
+    private RunMetaCommand defaultRunMetaCommand() {
+        return new RunMetaCommand(this::storeValue, () -> {
+            historyNameList.stream().forEach(name -> {
+                try {
+                    String prefix = String.format("%s = ", name);
+                    EsonValue value
+                            = environment.find(EsonID.from(name)).getValue();
+                    List<String> lines
+                            = value.on(PrettyPrint.from(prefix.length(), 0));
+                    System.out.print(prefix);
+                    lines.stream().forEach(System.out::println);
+                } catch (EsonUndefinedIDException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            });
+            System.out.println();
+            return 0;
+        }, () -> {
+            environment.getVariables().forEach(System.out::println);
+            return 0;
+        });
+    }
+
     private static class RunMetaCommand extends CaseFunction<Boolean> {
 
         Consumer<EsonValue> storeValue;
 
         Supplier<Integer> printHistory;
 
+        Supplier<Integer> printVariables;
+
         private RunMetaCommand(Consumer<EsonValue> storeValue,
-                Supplier<Integer> printHistory) {
+                Supplier<Integer> printHistory,
+                Supplier<Integer> printVariables) {
             super((value) -> {
                 storeValue.accept(value);
                 return true;
             });
             this.storeValue = storeValue;
             this.printHistory = printHistory;
+            this.printVariables = printVariables;
         }
 
         @Override
@@ -167,6 +186,9 @@ public class EsonSimpleREPL {
                 break;
             case "history":
                 printHistory.get();
+                break;
+            case "variables":
+                printVariables.get();
                 break;
             default:
                 storeValue.accept(symbol);
@@ -215,5 +237,49 @@ public class EsonSimpleREPL {
                 System.out.printf("UNKNOWN ERROR: %s\n", e.getMessage());
             }
         }
+    }
+
+    private void loadJavaLibs() {
+        for (EsonLib lib : javaLibs) {
+            try {
+                lib.inject(environment);
+            } catch (EsonRuntimeException e) {
+                System.out
+                        .printf("Unable to load library [%s] because of following error\n",
+                                lib.name());
+                String message = e.getCause().getMessage();
+                message = message == null ? "Oops..." : message;
+                System.out.printf("RUNTIME ERROR: %s\n", message);
+            } catch (Exception e) {
+                System.out.printf("UNKNOWN ERROR: %s\n", e.getMessage());
+            }
+        }
+    }
+
+    private void loadBaseLib() {
+        try {
+            InputStream inputStream = getClass().getClassLoader()
+                    .getResourceAsStream("base.eson");
+            scriptLoader.load(Objects.requireNonNull(inputStream), environment)
+                    .on(CheckType.OBJECT).getContent().forEach(entry -> {
+                        EsonID id = entry.getKey();
+                        EsonValue value = entry.getValue();
+                        try {
+                            environment.define(id, value);
+                        } catch (EsonRedefinitionException e) {
+                            throw EsonRuntimeException.causedBy(e);
+                        }
+                    });
+            return;
+        } catch (NullPointerException e) {
+            System.out.println("UNKNOWN ERROR: Cannot find base.eson");
+        } catch (EsonRuntimeException e) {
+            String message = e.getCause().getMessage();
+            message = message == null ? "Oops..." : message;
+            System.out.printf("RUNTIME ERROR: %s\n", message);
+        } catch (Exception e) {
+            System.out.printf("UNKNOWN ERROR: %s\n", e.getMessage());
+        }
+        System.out.println("WARNING: failed to load base.eson");
     }
 }

@@ -3,6 +3,7 @@ package cn.dzangfan.code.eson.data;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Supplier;
 
 import cn.dzangfan.code.eson.data.function.Evaluate;
 import cn.dzangfan.code.eson.data.function.IsCondition;
@@ -63,6 +64,10 @@ public class EsonLambda extends EsonValue {
 
     }
 
+    protected EsonLambda() {
+        this(null);
+    }
+
     private EsonLambda(List<Branch> content) {
         this(content, Environment.ROOT);
     }
@@ -115,7 +120,8 @@ public class EsonLambda extends EsonValue {
             return false;
     }
 
-    public EsonValue apply(EsonValue operand) {
+    public EsonValue apply(Supplier<EsonValue> operandSupplier) {
+        EsonValue operand = operandSupplier.get();
         try {
             for (Branch branch : content) {
                 Match.Result result
@@ -130,6 +136,11 @@ public class EsonLambda extends EsonValue {
         } catch (EsonException e) {
             throw EsonRuntimeException.causedBy(e);
         }
+    }
+
+    public String prettyPrint() {
+        return String.format("<lambda with %d branch(es)>",
+                             getContent().size());
     }
 
 }

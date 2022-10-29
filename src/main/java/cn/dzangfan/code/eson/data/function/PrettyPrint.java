@@ -155,8 +155,7 @@ public class PrettyPrint extends CaseFunction<List<String>> {
 
     @Override
     public List<String> whenLambda(EsonLambda lambda) {
-        return List.of(String.format("<lambda with %d branch(es)>",
-                                     lambda.getContent().size()));
+        return List.of(lambda.prettyPrint());
     }
 
     @Override

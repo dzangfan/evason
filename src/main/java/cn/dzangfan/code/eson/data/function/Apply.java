@@ -59,7 +59,7 @@ public class Apply extends CaseFunction<EsonValue> {
                         int times = number.floor();
                         for (int i = 0; i < times; ++i) {
                             EsonNumber num = EsonNumber.fromInteger(i);
-                            EsonValue result = lambda.apply(num);
+                            EsonValue result = lambda.apply(() -> num);
                             list.add(result);
                         }
                         return EsonArray.from(list);
@@ -145,7 +145,7 @@ public class Apply extends CaseFunction<EsonValue> {
 
     @Override
     public EsonValue whenLambda(EsonLambda lambda) {
-        return lambda.apply(operandSupplier.get());
+        return lambda.apply(operandSupplier);
     }
 
 }

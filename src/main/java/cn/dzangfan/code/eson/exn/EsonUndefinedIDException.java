@@ -16,4 +16,8 @@ public class EsonUndefinedIDException extends EsonException {
         return String.format("Undefined variable %s", id.getName());
     }
 
+    public EsonID getId() {
+        return id;
+    }
+
 }

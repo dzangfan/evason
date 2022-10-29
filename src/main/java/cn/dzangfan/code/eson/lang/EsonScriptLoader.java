@@ -1,6 +1,7 @@
 package cn.dzangfan.code.eson.lang;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
@@ -24,6 +25,16 @@ public class EsonScriptLoader {
 
     public static EsonScriptLoader getInstance() {
         return new EsonScriptLoader();
+    }
+
+    public EsonValue load(InputStream inputStream, Environment environment) {
+        try {
+            CharStream charStream = CharStreams.fromStream(inputStream);
+            return EsonValueReader.from(charStream).toEsonValue()
+                    .on(Evaluate.in(environment));
+        } catch (IOException e) {
+            throw EsonRuntimeException.causedBy(e);
+        }
     }
 
     public EsonValue load(String path, Environment environment, boolean force) {

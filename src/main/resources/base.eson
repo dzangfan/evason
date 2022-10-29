@@ -1,0 +1,6 @@
+{ lessThan: # (a b) => (__lessThan [a b]) #
+, lessEqual: # (a b) => (__lessEqual [a b]) #
+, greaterEqual: # (a b) => (__greaterEqual [a b]) #
+, greaterThan: # (a b) => (__greaterThan [a b]) #
+, numericallyEqual: # (a b) => (__numericallyEqual [a b]) #
+}

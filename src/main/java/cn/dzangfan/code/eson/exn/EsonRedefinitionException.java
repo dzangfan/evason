@@ -17,8 +17,7 @@ public class EsonRedefinitionException extends EsonException {
 
     @Override
     public String getMessage() {
-        return String.format("Redefining local variable %s is unsupported",
-                             oldId.getName());
+        return String.format("Redefining variable %s", oldId.getName());
     }
 
 }

@@ -118,7 +118,7 @@ BIIIIG NEWS!! Comma(,) in JSON is syntactic OPTIONAL! Well, I know it is not tha
 
 ## PAQ
 
-This is some answers for possibly asked questions, and some technology may be useful if you want to use Evason to program. Note that since Evason borrowed Scheme's syntactic highlight (currently), we will use `;;` as the comment notation in following sections.
+Here are some answers for possibly asked questions, and some technologies may be useful if you (really) want to use Evason to program. Note that since Evason borrowed Scheme's syntactic highlight (currently), we will use `;;` as the comment notation in following sections.
 
 ### Q: How to declare local variables?
 

@@ -70,11 +70,9 @@ public class ToEsonValueVisitor extends EsonBaseVisitor<EsonValue> {
 
     @Override
     public EsonValue visitLoadedArray(LoadedArrayContext ctx) {
-        List<EsonValue> content
-                = ctx.value().stream().map(this::visit).toList();
+        List<EsonValue> content = ctx.values.stream().map(this::visit).toList();
         EsonArray array = EsonArray.from(content);
-        return ctx.ID() == null ? array
-                : array.withRest(EsonID.from(ctx.ID().getText()));
+        return ctx.rest == null ? array : array.withRest(visit(ctx.rest));
     }
 
     @Override
@@ -85,8 +83,7 @@ public class ToEsonValueVisitor extends EsonBaseVisitor<EsonValue> {
             return Entry.from(key, value);
         }).toList();
         EsonObject object = EsonObject.from(content);
-        return ctx.ID() == null ? object
-                : object.withRest(EsonID.from(ctx.ID().getText()));
+        return ctx.rest == null ? object : object.withRest(visit(ctx.rest));
     }
 
     @Override

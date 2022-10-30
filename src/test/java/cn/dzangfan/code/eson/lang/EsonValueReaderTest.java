@@ -72,12 +72,14 @@ class EsonValueReaderTest {
                         .withRest(EsonID.from("continue"));
         read("{ x: 10, ...continue }", objectWithRest);
         read("{ x: 10 ... continue }", objectWithRest);
-        EsonValue objectNeedExpand = EsonObject
+        EsonObject objectNeedExpand = EsonObject
                 .from(Entry.from("x", EsonID.from("x")),
                       Entry.from("y", EsonID.from("y")))
                 .withRest(EsonID.from("z"));
         read("{ x, y, ...z }", objectNeedExpand);
         read("{ x y ...z}", objectNeedExpand);
+        read("{ x y ...{ z }}", objectNeedExpand
+                .withRest(EsonObject.from(Entry.from("z", EsonID.from("z")))));
     }
 
     @Test
@@ -90,6 +92,8 @@ class EsonValueReaderTest {
         read("[true is null]", array);
         read("[true is null ...sigh]", array.withRest(EsonID.from("sigh")));
         read("[true is null, ...sign]", array.withRest(EsonID.from("sign")));
+        read("[true is null, ...(2 sign)]", array.withRest(EsonApplication
+                .from(EsonNumber.fromInteger(2), EsonID.from("sign"))));
     }
 
     @Test

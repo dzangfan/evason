@@ -54,8 +54,8 @@ public class GetDependencies extends CaseFunction<Set<String>> {
                 .map(value -> value.on(INSTANCE)).forEach(dep -> {
                     union.addAll(dep);
                 });
-        object.getMaybeRest().ifPresent(id -> {
-            union.add(id.getName());
+        object.getMaybeRest().ifPresent(value -> {
+            union.addAll(value.on(INSTANCE));
         });
         return union;
     }
@@ -67,8 +67,8 @@ public class GetDependencies extends CaseFunction<Set<String>> {
                 .forEach(dep -> {
                     union.addAll(dep);
                 });
-        array.getMaybeRest().ifPresent(id -> {
-            union.add(id.getName());
+        array.getMaybeRest().ifPresent(value -> {
+            union.addAll(value.on(INSTANCE));
         });
         return union;
     }

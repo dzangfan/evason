@@ -88,8 +88,8 @@ public class Evaluate extends CaseFunction<EsonValue> {
             }
             newObject.add(entry.getKey(), value);
         }
-        object.getMaybeRest().ifPresent(id -> {
-            id.on(this).on(new ExceptionCaseFunction<List<Entry>>(
+        object.getMaybeRest().ifPresent(value -> {
+            value.on(this).on(new ExceptionCaseFunction<List<Entry>>(
                     GetType.Type.OBJECT) {
 
                 @Override
@@ -112,9 +112,9 @@ public class Evaluate extends CaseFunction<EsonValue> {
     public EsonValue whenArray(EsonArray array) {
         List<EsonValue> evaluatedContent = new ArrayList<EsonValue>(array
                 .getContent().stream().map(value -> value.on(this)).toList());
-        array.getMaybeRest().ifPresent(id -> {
+        array.getMaybeRest().ifPresent(value -> {
             List<EsonValue> content
-                    = id.on(this).on(new ExceptionCaseFunction<List<EsonValue>>(
+                    = value.on(this).on(new ExceptionCaseFunction<List<EsonValue>>(
                             GetType.Type.ARRAY) {
 
                         @Override

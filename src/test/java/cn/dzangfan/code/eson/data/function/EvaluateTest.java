@@ -237,6 +237,21 @@ class EvaluateTest {
     }
 
     @Test
+    void testWhenObjectWithRestValue() {
+        Environment localEnvironment = ROOT.extend();
+        EsonObject object = EsonObject
+                .from(Entry.from("x", EsonNumber.fromInteger(0)),
+                      Entry.from("y", EsonNumber.fromInteger(1)))
+                .withRest(EsonObject
+                        .from(Entry.from("y", EsonNumber.fromInteger(10)),
+                              Entry.from("z", EsonNumber.fromInteger(2))));
+        evalTo(EsonObject.from(Entry.from("x", EsonNumber.fromInteger(0)),
+                               Entry.from("y", EsonNumber.fromInteger(1)),
+                               Entry.from("z", EsonNumber.fromInteger(2))),
+               object, localEnvironment);
+    }
+
+    @Test
     void testWhenArrayWithRest() throws EsonRedefinitionException {
         Environment localEnvironment = ROOT.extend();
         localEnvironment.define(EsonID.from("rest"), EsonArray
@@ -244,6 +259,21 @@ class EvaluateTest {
                       EsonNumber.fromInteger(3), EsonNumber.fromInteger(4)));
         EsonArray array = EsonArray.from(EsonNumber.fromInteger(0))
                 .withRest(EsonID.from("rest"));
+        evalTo(EsonArray
+                .from(EsonNumber.fromInteger(0), EsonNumber.fromInteger(1),
+                      EsonNumber.fromInteger(2), EsonNumber.fromInteger(3),
+                      EsonNumber.fromInteger(4)),
+               array, localEnvironment);
+    }
+
+    @Test
+    void testWhenArrayWithResultValue() throws EsonRedefinitionException {
+        Environment localEnvironment = ROOT.extend();
+        EsonArray array = EsonArray.from(EsonNumber.fromInteger(0))
+                .withRest(EsonArray.from(EsonNumber.fromInteger(1),
+                                         EsonNumber.fromInteger(2),
+                                         EsonNumber.fromInteger(3),
+                                         EsonNumber.fromInteger(4)));
         evalTo(EsonArray
                 .from(EsonNumber.fromInteger(0), EsonNumber.fromInteger(1),
                       EsonNumber.fromInteger(2), EsonNumber.fromInteger(3),

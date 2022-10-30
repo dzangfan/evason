@@ -10,7 +10,7 @@ public class EsonObject extends EsonValue {
 
     private List<Entry> content;
 
-    private Optional<EsonID> maybeRest;
+    private Optional<EsonValue> maybeRest;
 
     public static class Entry {
         private EsonID key;
@@ -64,11 +64,11 @@ public class EsonObject extends EsonValue {
         this.content = content;
     }
 
-    public Optional<EsonID> getMaybeRest() {
+    public Optional<EsonValue> getMaybeRest() {
         return maybeRest;
     }
 
-    public void setMaybeRest(Optional<EsonID> maybeRest) {
+    public void setMaybeRest(Optional<EsonValue> maybeRest) {
         this.maybeRest = maybeRest;
     }
 
@@ -76,7 +76,7 @@ public class EsonObject extends EsonValue {
         this(content, Optional.empty());
     }
 
-    private EsonObject(List<Entry> content, Optional<EsonID> maybeRest) {
+    private EsonObject(List<Entry> content, Optional<EsonValue> maybeRest) {
         super();
         this.content = content;
         this.maybeRest = maybeRest;
@@ -91,8 +91,8 @@ public class EsonObject extends EsonValue {
                 new ArrayList<EsonObject.Entry>(Arrays.asList(content)));
     }
 
-    public EsonObject withRest(EsonID id) {
-        return new EsonObject(content, Optional.of(id));
+    public EsonObject withRest(EsonValue value) {
+        return new EsonObject(content, Optional.of(value));
     }
 
     public EsonObject withoutRest() {

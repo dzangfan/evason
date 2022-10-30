@@ -6,9 +6,7 @@ to express the maximum by Evason.
 
 ```javascript
 { concat: # ([]           rhs) => rhs
-          | ([fst ...rst] rhs) =>
-              (# { concated } => [fst ...concated] #
-               { concated: (concat rst rhs) })
+          | ([fst ...rst] rhs) => [fst ...(concat rst rhs)]
           #
 , reverse: # [] => []
            | [fst ...rst] => (concat (reverse rst) [fst])
@@ -46,8 +44,7 @@ Borrowed from JavaScript, we use `...` + `variable` to match "rest" components o
 ```javascript
 { map: # { fun, list: [] } => []
        | { fun, list: [fst, ...rst]} =>
-         (# { mapped } => [(fun fst) ...mapped ] #
-          { mapped: (map { fun, list: rst })})
+         [(fun fst), ...(map { fun, list: rst })]
        #
 , result: (map { fun: # x => [ x ] #, list: [1, 2, 3]})
 }

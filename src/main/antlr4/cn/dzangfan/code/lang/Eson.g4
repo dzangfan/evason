@@ -20,12 +20,12 @@ condValue
 
 array
 :
-    '[' value
+    '[' values+=value
     (
-        ','? value
+        ','? values+=value
     )*
     (
-        ','? '...' ID
+        ','? '...' rest=value
     )? ']' # loadedArray
     | '[' ']' # emptyArray
 ;
@@ -37,7 +37,7 @@ object
         ','? objectPair
     )*
     (
-        ','? '...' ID
+        ','? '...' rest=value
     )? '}' # loadedObject
     | '{' '}' # emptyObject
 ;

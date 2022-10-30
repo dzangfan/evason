@@ -243,20 +243,21 @@ public class Match extends CaseFunction<Match.Result> {
                 }
 
                 if (needCollectRest) {
-                    String restName = condObject.getMaybeRest().get().getName();
+                    EsonID id
+                            = condObject.getMaybeRest().get().on(CheckType.ID);
+                    String restName = id.getName();
                     if (symbolTable.isDefined(restName)) {
                         EsonRedefinitionException e
                                 = new EsonRedefinitionException(
                                         symbolTable.get(restName).get().getId(),
-                                        condObject.getMaybeRest().get());
+                                        id);
                         throw EsonRuntimeException.causedBy(e);
                     }
                     List<Entry> restContent = valObject.getContent().stream()
                             .filter(entry -> unusedFields
                                     .contains(entry.getKey().getName()))
                             .toList();
-                    symbolTable.put(condObject.getMaybeRest().get(),
-                                    EsonObject.from(restContent));
+                    symbolTable.put(id, EsonObject.from(restContent));
                 }
 
                 return Result.matched(symbolTable);
@@ -311,16 +312,16 @@ public class Match extends CaseFunction<Match.Result> {
                 }
 
                 if (needCollectRest) {
-                    String restName = condArray.getMaybeRest().get().getName();
+                    EsonID id = condArray.getMaybeRest().get().on(CheckType.ID);
+                    String restName = id.getName();
                     if (symbolTable.isDefined(restName)) {
                         EsonRedefinitionException e
                                 = new EsonRedefinitionException(
                                         symbolTable.get(restName).get().getId(),
-                                        condArray.getMaybeRest().get());
+                                        id);
                         throw EsonRuntimeException.causedBy(e);
                     }
-                    symbolTable.put(condArray.getMaybeRest().get(),
-                                    EsonArray.from(restContent));
+                    symbolTable.put(id, EsonArray.from(restContent));
                 }
 
                 return Result.matched(symbolTable);

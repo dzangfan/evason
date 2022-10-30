@@ -83,7 +83,7 @@ However, notations like `# a => b => c => ... ###` and `(((f a) b) c)` is very a
 
 ### World of Function
 
-Everything in Evason is a function, even including primitive data type like string and number. The specific meaning depends on specfic data type. You have been familiar with data type `lambda`, but before we introduce functional meanings of other types, we would like to show you another (and the last) data type that Evason added to JSON -- Symbol. A symbol is basically a string, denoted by `'name`. Like many languages supporting meta-programming, which is using symbol as meta data, Evason always use symbols to denote field of object or concept of `enum` in languages like C or Java. Here is other meanings of data types when they are used as a function:
+Everything in Evason is a function, even including primitive data type like string and number. The specific meaning depends on specfic data type. You have been familiar with data type `lambda`, but before we introduce functional meanings of other types, we would like to show you another (and the last) data type that Evason added to JSON -- Symbol. A symbol is basically a string, denoted by `'name`. Like many languages supporting meta-programming, which use symbols as meta data, Evason always uses symbols to denote field of object or concept of `enum` in languages like C or Java. Here is respective meanings of data types when they are used as a function:
 
 - Object: Take a symbol as a field name, return the corresponding value in the object.
   + e.g. `({ x: 10, y: 20 } 'x)` = `10`
@@ -175,9 +175,9 @@ To express mutiple conditions, you can just pass a condition selection as the se
 
 ```scheme
 { Joe: { name: "Joe", age: 1000 }
-, ageRange: # { age } => ((lessThan age 18) 'child
-                           ((lessThan age 60) 'adult
-                                              'old))
+, ageRange: # { age } => ((lessThan age 18)  'child
+                          ((lessThan age 60) 'adult
+                                             'old))
             #
 , result: (ageRange Joe)
 }

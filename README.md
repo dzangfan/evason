@@ -59,7 +59,7 @@ A function can only be applied by exactly one argument. But you can "chain" lamb
 , result: (((take3 "Where") "is") "Alice") }
 ```
 
-This feature, called [currying](https://en.wikipedia.org/wiki/Currying), is common in functional programming partially because of its flexibility of cooperate with other functions. For example, we can easily define a new function by provide some but not all arguments to `take3`:
+This feature, called [currying](https://en.wikipedia.org/wiki/Currying), is common in functional programming partially because of its flexibility of cooperating with other functions. For example, we can easily define a new function by provide some but not all arguments to `take3`:
 
 ```javascript
 { whereIs: ((take3 "Where") "is")

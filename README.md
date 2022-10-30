@@ -205,3 +205,50 @@ If you think this code is obscure, ambiguous, and unacceptable, here is another 
 , result: (ageRange Joe)
 }
 ```
+
+### Q: How to add two numbers?
+
+Evason provides a series "primitive" functions which are defined by language itself. `lessThan`, appeared in previous section, is one of them. Numerical operation can be performed by following functions:
+
+- `plus`
+- `minus` 
+- `mul` (multiple)
+- `div` (divide)
+- `mod`
+
+So if you want to add two numbers up, you can call `plus` by `(plus a b)`. If you are not a loyal fan of Lisp, this style of "plus" may make you fill mental discomfort. Again, here is a fancy alternative to relieve  it:
+
+```javascript
+{ aNumber: # n => { value: n
+                  , adds: # { value } => (aNumber (plus value n)) #
+                  , times: # { value } => (aNumber (mul value n)) #
+                  }
+           #
+}
+```
+
+I call this packaging, which pack the original value with some additional methods:
+
+```scheme
+((aNumber 10) 'times (aNumber 20) 'adds (aNumber 5) 'value) ;; 205
+```
+
+The merit of packaging is you can simply extend it to make it behave more or less [polymorphically](https://en.wikipedia.org/wiki/Polymorphism):
+
+```javascript
+{ aMagicalNumber: # n => { adds: # { value } => 
+                                   (aMagicalNumber (mul 10
+                                                        (plus value n)))
+                                 #
+                         , ...(aNumber n)
+                         }
+                 #
+}
+```
+
+then
+
+```scheme
+((aNumber 10) 'adds (aNumber 20) 'value) ;; 30
+((aMagicalNumber 10) 'adds (aNumber 20) 'value) ;; 300
+```

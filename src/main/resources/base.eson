@@ -3,4 +3,11 @@
 , greaterEqual: # (a b) => (__greaterEqual [a b]) #
 , greaterThan: # (a b) => (__greaterThan [a b]) #
 , numericallyEqual: # (a b) => (__numericallyEqual [a b]) #
+, plus: # (a b) => (__plus [a b]) #
+, minus: # (a b) => (__minus [a b]) #
+, mul: # (a b) => (__mul [a b]) #
+, div: # (a b) => (__div [a b]) #
+, mod: # (a b) => (__mod [a b]) #
+, inc: (plus 1)
+, dec: # x => (minus x 1) #
 }

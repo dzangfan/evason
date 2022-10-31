@@ -252,3 +252,34 @@ then
 ((aNumber 10) 'adds (aNumber 20) 'value) ;; 30
 ((aMagicalNumber 10) 'adds (aNumber 20) 'value) ;; 300
 ```
+
+### T: Fluent API
+
+Like fluent API? Here is a simple one:
+
+```scheme
+{ select: # singleField =>
+            { from: # singleTable =>
+                      { go: ("select " singleField " from " singleTable)
+                      , where: (# ({ opTable } lhs op rhs 'go) =>
+                                  (go " where " lhs " " (opTable op) " " rhs)
+                                # { opTable: { equals: "=", lessThan: "<" } })
+                      }
+                    #
+            }
+          #
+}
+```
+
+then
+
+```scheme
+;; "select * from tb_person"
+(select "*" 'from "tb_person" 'go)
+
+;; "select * from tb_person where age = 10"
+(select "*" 'from "tb_person" 'where "age" 'equals "10" 'go)
+
+;; "select * from tb_person where age < 10"
+(select "*" 'from "tb_person" 'where "age" 'lessThan "10" 'go)
+```

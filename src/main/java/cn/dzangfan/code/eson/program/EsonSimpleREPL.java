@@ -56,7 +56,7 @@ public class EsonSimpleREPL {
             System.out.print(">>> ");
             repl.readAndEvaluate().ifPresent(value -> {
                 if (value.on(runMetaCommand)) {
-                    System.out.printf(PrettyPrint.the(value));
+                    System.out.println(PrettyPrint.the(value));
                 }
             });
             System.out.println();

@@ -258,14 +258,11 @@ then
 Like fluent API? Here is a simple one:
 
 ```scheme
-{ select: # singleField =>
-            { from: # singleTable =>
-                      { go: ("select " singleField " from " singleTable)
-                      , where: (# ({ opTable } lhs op rhs 'go) =>
-                                  (go " where " lhs " " (opTable op) " " rhs)
-                                # { opTable: { equals: "=", lessThan: "<" } })
-                      }
-                    #
+{ select: # (field 'from table) =>
+            { go: ("select " field " from " table)
+            , where: (# ({ opTable } lhs op rhs 'go) =>
+                        (go " where " lhs " " (opTable op) " " rhs)
+                      # { opTable: { equals: "=", lessThan: "<" } })
             }
           #
 }
